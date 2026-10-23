@@ -1,9 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   resolveCase, 
   getChecklist, 
   getJourney, 
-  validateForm, 
   getCenters, 
   trackApplication, 
   getDemoIds, 
@@ -877,21 +876,23 @@ function DocumentChecklistView({ isUrdu }) {
         <div>
           <div style={{ fontSize: 26, fontWeight: 800, color: 'var(--nadra-dark)', display: 'flex', alignItems: 'center', gap: 10 }}>
             <IconChecklist size={28} color="var(--nadra-forest)" />
-            <span>Dynamic Personalized Document Checklist</span>
+            <span>{isUrdu ? 'دستاویزات کی ذاتی چیک لسٹ' : 'Dynamic Personalized Document Checklist'}</span>
           </div>
           <div style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 4 }}>
-            Select any official NADRA service to generate the exact required documents, fees, and attestation criteria.
+            {isUrdu 
+              ? 'کسی بھی نادرا سروس کا انتخاب کریں اور درکار اصل کاغذات، فیس اور تصدیقی شرائط حاصل کریں۔'
+              : 'Select any official NADRA service to generate the exact required documents, fees, and attestation criteria.'}
           </div>
         </div>
         <span className="tag-badge tag-green" style={{ fontSize: 13.5, padding: '6px 16px' }}>
-          Zero Counter Rejection
+          {isUrdu ? 'زیرو ریجیکشن ضمانت' : 'Zero Counter Rejection'}
         </span>
       </div>
 
       {/* Service Selector: Pills + Dropdown */}
       <div style={{ marginBottom: 28 }}>
         <label style={{ fontSize: 13.5, fontWeight: 800, color: 'var(--nadra-forest)', textTransform: 'uppercase', display: 'block', marginBottom: 12 }}>
-          Choose Official NADRA Service:
+          {isUrdu ? 'نادرا سروس کا انتخاب کریں:' : 'Choose Official NADRA Service:'}
         </label>
         
         {/* Quick Click Pills */}
@@ -903,7 +904,7 @@ function DocumentChecklistView({ isUrdu }) {
               style={{ fontSize: 14, padding: '10px 18px' }}
               onClick={() => setSelectedServiceId(s.service_id)}
             >
-              {s.title_en}
+              {isUrdu ? (s.title_ur || s.title_en) : s.title_en}
             </button>
           ))}
         </div>
@@ -2404,37 +2405,43 @@ function AppTrackerView({ isUrdu }) {
         <div>
           <div style={{ fontSize: 26, fontWeight: 800, color: 'var(--nadra-dark)', display: 'flex', alignItems: 'center', gap: 10 }}>
             <IconTracker size={28} color="var(--nadra-forest)" />
-            <span>Application Tracker & AI Rejection Explainer</span>
+            <span>{isUrdu ? 'درخواست ٹریکر اور اے آئی وجوہات' : 'Application Tracker & AI Rejection Explainer'}</span>
           </div>
           <div style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 4 }}>
-            Track your token reference and receive plain-language explanations for delays or rejections.
+            {isUrdu 
+              ? 'اپنا ٹوکن ریفرنس نمبر درج کریں اور تاخیر یا مسترد ہونے کی سرکاری وجوہات آسان زبان میں سمجھیں۔'
+              : 'Track your token reference and receive plain-language explanations for delays or rejections.'}
           </div>
         </div>
-        <span className="tag-badge tag-green" style={{ fontSize: 13.5, padding: '6px 16px' }}>Empathy & Action Engine</span>
+        <span className="tag-badge tag-green" style={{ fontSize: 13.5, padding: '6px 16px' }}>
+          {isUrdu ? 'ہمدردانہ رہنمائی' : 'Empathy & Action Engine'}
+        </span>
       </div>
 
       <div style={{ display: 'flex', gap: 14, marginBottom: 22 }}>
         <input 
           className="neu-input" 
-          placeholder="Enter tracking ID (e.g. TRK-REJECT-303)..."
+          placeholder={isUrdu ? "ٹریکنگ آئی ڈی درج کریں (مثلاً TRK-REJECT-303)..." : "Enter tracking ID (e.g. TRK-REJECT-303)..."}
           value={trackingId}
           onChange={e => setTrackingId(e.target.value)}
         />
         <button className="neu-button neu-button-primary" style={{ flexShrink: 0, padding: '16px 32px' }} onClick={() => track(trackingId)}>
           <IconSearch size={18} color="#ffffff" />
-          <span>{loading ? 'Tracking...' : 'Track Application'}</span>
+          <span>{loading ? (isUrdu ? 'تلاش جاری ہے...' : 'Tracking...') : (isUrdu ? 'درخواست چیک کریں' : 'Track Application')}</span>
         </button>
       </div>
 
       <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginBottom: 30 }}>
-        <span style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text-muted)' }}>Judge Demo Presets:</span>
+        <span style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text-muted)' }}>
+          {isUrdu ? 'ججز ڈیمو نمونے:' : 'Judge Demo Presets:'}
+        </span>
         {demoIds.map(d => (
           <button 
-            key={d.id} 
+            key={d.id || d.tracking_id} 
             className="prompt-pill" 
-            onClick={() => { setTrackingId(d.id); track(d.id); }}
+            onClick={() => { const tid = d.id || d.tracking_id; setTrackingId(tid); track(tid); }}
           >
-            {d.id} ({d.label})
+            {d.id || d.tracking_id} ({d.label})
           </button>
         ))}
       </div>
@@ -2521,10 +2528,16 @@ function Footer({ isUrdu }) {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 40, paddingBottom: 36, borderBottom: '1px solid rgba(255,255,255,0.12)' }}>
           <div>
             <div style={{ color: '#ffffff', fontSize: 19, fontWeight: 900, marginBottom: 14 }}>
-              NADRA NAVIGATOR
+              {isUrdu ? 'نادرا نیویگیٹر 🇵🇰' : 'NADRA NAVIGATOR 🇵🇰'}
             </div>
             <p style={{ fontSize: 14, lineHeight: 1.65, color: '#cbd5e1', maxWidth: 480 }}>
-              AI-Powered Citizen Guide designed for the <strong>DITE Hackathon 2026-27</strong> under the <strong>Public Service</strong> theme. Built to eliminate application rejection and simplify government access for all Pakistani citizens.
+              {isUrdu ? (
+                <span className="urdu-font" style={{ fontSize: 16 }}>
+                  پاکستانی شہریوں کے لیے اے آئی رہبر، پبلک سروس تھیم کے تحت <strong>ڈائٹ ہیکاتھون 2026-27</strong> کے لیے تیار کردہ۔ مقصد نادرا سنٹرز پر فارم مسترد ہونے کے مسائل کا خاتمہ اور سرکاری طریقہ کار کو آسان بنانا ہے۔
+                </span>
+              ) : (
+                <>AI-Powered Citizen Guide designed for the <strong>DITE Hackathon 2026-27</strong> under the <strong>Public Service</strong> theme. Built to eliminate application rejection and simplify government access for all Pakistani citizens.</>
+              )}
             </p>
             <div style={{ marginTop: 16, fontSize: 12.5, color: '#94a3b8' }}>
               Organised by <strong>TECHGEN</strong> · Denning Institute of Technology & Entrepreneurship, Hyderabad.
@@ -2533,20 +2546,20 @@ function Footer({ isUrdu }) {
 
           <div>
             <div style={{ color: '#ffffff', fontSize: 17, fontWeight: 800, marginBottom: 14 }}>
-              TEAM MEMBERS
+              {isUrdu ? 'ٹیم کے اراکین' : 'TEAM MEMBERS'}
             </div>
             <div>
               <div className="team-pill">
                 <IconUser size={15} color="#86efac" />
-                <span>Fizza Baloch (Team Leader)</span>
+                <span>{isUrdu ? 'فضا بلوچ (ٹیم لیڈر)' : 'Fizza Baloch (Team Leader)'}</span>
               </div>
               <div className="team-pill">
                 <IconCode size={15} color="#93c5fd" />
-                <span>Aleena Memon</span>
+                <span>{isUrdu ? 'علینہ میمن (انجینئر / ریسرچر)' : 'Aleena Memon (Core Engineer)'}</span>
               </div>
               <div className="team-pill">
                 <IconPalette size={15} color="#fde047" />
-                <span>Fiza Nizamani</span>
+                <span>{isUrdu ? 'فضا نظامانی (انجینئر / ڈیزائنر)' : 'Fiza Nizamani (Core Engineer)'}</span>
               </div>
             </div>
           </div>

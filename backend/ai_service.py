@@ -4,6 +4,10 @@ import urllib.request
 import urllib.error
 from dotenv import load_dotenv
 
+# Load .env from backend directory first, then fallback to current working directory
+_env_path = os.path.join(os.path.dirname(__file__), ".env")
+if os.path.exists(_env_path):
+    load_dotenv(_env_path)
 load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
@@ -13,6 +17,9 @@ def call_gemini(prompt: str, system_instruction: str = None) -> str:
     Calls Google Gemini REST API directly using Python's standard library.
     Guarantees zero-dependency reliability and fast execution.
     """
+    if not GEMINI_API_KEY or GEMINI_API_KEY.startswith("your_"):
+        return None
+
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key={GEMINI_API_KEY}"
     
     contents = []
@@ -96,7 +103,7 @@ def resolve_case_ai(user_query: str, language: str = "auto") -> dict:
     # High-precision Deterministic Fallback if offline/API limit
     q_lower = user_query.lower()
     
-    if any(k in q_lower for k in ["b form", "b-form", "bacha", "child", "crc", "paidaish", "birth"]):
+    if any(k in q_lower for k in ["b form", "b-form", "bacha", "child", "crc", "paidaish", "birth", "baaran", "barokho", "baro", "tfl"]):
         return {
             "service_id": "crc_bform",
             "service_title": "Child Registration Certificate (B-Form / CRC)",
@@ -110,7 +117,7 @@ def resolve_case_ai(user_query: str, language: str = "auto") -> dict:
             "estimated_fee_pkr": 500,
             "estimated_days": 15
         }
-    elif any(k in q_lower for k in ["expire", "renew", "khatam", "purana", "date nikal"]):
+    elif any(k in q_lower for k in ["expire", "renew", "khatam", "purana", "date nikal", "thee viyo", "thee wayo", "khatim", "mudat"]):
         return {
             "service_id": "cnic_renewal",
             "service_title": "CNIC Renewal (Expired Card)",
@@ -124,7 +131,7 @@ def resolve_case_ai(user_query: str, language: str = "auto") -> dict:
             "estimated_fee_pkr": 1500,
             "estimated_days": 15
         }
-    elif any(k in q_lower for k in ["shaadi", "shadi", "married", "husband", "father", "naam", "name", "ghalat", "tabdeeli", "change", "address", "pata"]):
+    elif any(k in q_lower for k in ["shaadi", "shadi", "married", "husband", "father", "naam", "name", "ghalat", "tabdeeli", "change", "address", "pata", "waranu", "badlai", "durustagi", "theek"]):
         return {
             "service_id": "cnic_modification",
             "service_title": "CNIC Modification (Correction / Marital Status)",

@@ -1690,11 +1690,11 @@ function FormDoctorView({ isUrdu }) {
         form_id: fId,
         sample_type: scanType
       });
-      if (res.status === 'success') {
+      if (res && res.status === 'success') {
         setAuditResult(res);
       }
     } catch (err) {
-      alert("Error auditing document: " + err.message);
+      console.warn("Audit document notice:", err);
     } finally {
       setLoading(false);
     }
@@ -1781,11 +1781,13 @@ function FormDoctorView({ isUrdu }) {
       {/* 3. Document / Scan Source (Upload File OR Select Demo Scan) */}
       <div style={{ padding: '20px 24px', background: '#f8fafc', borderRadius: 14, border: '1.5px solid #e2e8f0', marginBottom: 30 }}>
         <label style={{ fontSize: 13.5, fontWeight: 800, color: 'var(--nadra-forest)', textTransform: 'uppercase', display: 'block', marginBottom: 12 }}>
-          2. Document Photo / Scan Inspector:
+          {isUrdu ? '2. دستاویز کا معائنہ اور اسکین:' : '2. Document Photo / Scan Inspector:'}
         </label>
 
-        <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text-muted)' }}>Select Diagnostic Form Sample:</span>
+        <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text-muted)' }}>
+            {isUrdu ? 'تشخیصی نمونہ منتخب کریں:' : 'Select Diagnostic Form Sample:'}
+          </span>
 
           {sampleScans.map(s => (
             <button
@@ -1800,6 +1802,25 @@ function FormDoctorView({ isUrdu }) {
               {s.label}
             </button>
           ))}
+
+          {/* Real File Upload Input */}
+          <label 
+            className="neu-button" 
+            style={{ 
+              cursor: 'pointer', 
+              padding: '8px 16px', 
+              fontSize: 13, 
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              gap: 6,
+              background: uploadedFileName ? 'var(--nadra-mint-soft)' : '#ffffff',
+              borderColor: uploadedFileName ? 'var(--nadra-emerald)' : '#cbd5e1'
+            }}
+          >
+            <IconPrinter size={15} />
+            <span>{uploadedFileName ? `✓ ${uploadedFileName}` : (isUrdu ? 'فارم اپلوڈ کریں' : 'Upload Form Photo / Scan')}</span>
+            <input type="file" accept="image/*,.pdf" style={{ display: 'none' }} onChange={handleFileUpload} />
+          </label>
         </div>
       </div>
 
@@ -1840,7 +1861,8 @@ function FormDoctorView({ isUrdu }) {
 
           {/* Active Section Explainer Box */}
           {auditResult && auditResult.sections && (() => {
-            const currentSec = auditResult.sections.find(s => s.section_id === activeSectionTab) || auditResult.sections[0];
+            const currentSec = (auditResult.sections.find(s => s.section_id === activeSectionTab)) || auditResult.sections[0];
+            if (!currentSec) return null;
             return (
               <div style={{ padding: 22, background: 'var(--nadra-mint-soft)', border: '1.5px solid var(--nadra-mint-border)', borderRadius: 14, marginBottom: 24 }}>
                 <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--nadra-forest)', marginBottom: 4 }}>
@@ -2126,7 +2148,7 @@ function FormDoctorView({ isUrdu }) {
                   CHECKS PASSED & VERIFIED
                 </span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {auditResult.passed_checks.map((chk, i) => (
+                  {(auditResult.passed_checks || []).map((chk, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 13.5, color: 'var(--text-primary)' }}>
                       <IconCheck size={16} color="var(--nadra-emerald)" />
                       <span>{chk}</span>

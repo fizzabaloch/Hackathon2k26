@@ -1,0 +1,14 @@
+# Root gitignore
+.env
+.env.production
+__pycache__/
+*.pyc
+*.pyo
+*.db
+node_modules/
+dist/
+.DS_Store
+*.log
+make_docs.py
+arch_diagram.png
+erd_diagram.png
